@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Word Guess Game</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #f7f7f9, #9d54e6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .game-container {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .word {
+        font-size: 24px;
+        letter-spacing: 8px;
+        margin: 15px 0;
+    }
+
+    pre {
+        font-size: 14px;
+        text-align: left;
+        background: #f4f4f4;
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    input {
+        padding: 8px;
+        width: 60px;
+        font-size: 18px;
+        text-align: center;
+    }
+
+    button {
+        padding: 8px 12px;
+        margin: 8px;
+        border: none;
+        border-radius: 6px;
+        background-color: #b85ccb;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #5563c1;
+    }
+
+    .message {
+        font-weight: bold;
+        margin-top: 10px;
+    }
+</style>
+</head>
+
+<body>
+<div class="game-container">
+    <h2>Hangman Game</h2>
+
+    <pre id="hangman"></pre>
+
+    <div class="word" id="wordDisplay"></div>
+
+    <input type="text" id="guessInput" maxlength="1">
+    <button onclick="guessLetter()">Guess</button>
+    <button onclick="restartGame()">Restart</button>
+
+    <div id="attemptsDisplay"></div>
+    <div class="message" id="message"></div>
+</div>
+
+<script>
+const wordList = ["rizz", "ohio", "sigma", "tiktok", "skibidi"];
+
+const hangmanStages = [
+` 
+ +---+
+ |   |
+     |
+     |
+     |
+     |
+=========`,
+`
+ +---+
+ |   |
+ O   |
+     |
+     |
+     |
+=========`,
+`
+ +---+
+ |   |
+ O   |
+ |   |
+     |
+     |
+=========`,
+`
+ +---+
+ |   |
+ O   |
+/|   |
+     |
+     |
+=========`,
+`
+ +---+
+ |   |
+ O   |
+/|\\  |
+     |
+     |
+=========`,
+`
+ +---+
+ |   |
+ O   |
+/|\\  |
+/    |
+     |
+=========`,
+`
+ +---+
+ |   |
+ O   |
+/|\\  |
+/ \\  |
+     |
+=========`
+];
+
+let word, guessedWord, attempts;
+
+const wordDisplay = document.getElementById("wordDisplay");
+const attemptsDisplay = document.getElementById("attemptsDisplay");
+const message = document.getElementById("message");
+const guessInput = document.getElementById("guessInput");
+const hangman = document.getElementById("hangman");
+
+function startGame() {
+    word = wordList[Math.floor(Math.random() * wordList.length)];
+    guessedWord = Array(word.length).fill("_");
+    attempts = hangmanStages.length - 1;
+    guessInput.disabled = false;
+    message.textContent = "";
+    updateDisplay();
+}
+
+function updateDisplay() {
+    wordDisplay.textContent = guessedWord.join(" ");
+    attemptsDisplay.textContent = "Attempts left: " + attempts;
+    hangman.textContent = hangmanStages[hangmanStages.length - 1 - attempts];
+}
+
+function guessLetter() {
+    const guess = guessInput.value.toLowerCase();
+    guessInput.value = "";
+
+    if (!guess) return;
+
+    if (word.includes(guess)) {
+        for (let i = 0; i < word.length; i++) {
+            if (word[i] === guess) guessedWord[i] = guess;
+        }
+        message.textContent = "Correct!";
+    } else {
+        attempts--;
+        message.textContent = "Wrong!";
+    }
+
+    if (!guessedWord.includes("_")) {
+        message.textContent = "🎉 You Win! Word: " + word;
+        guessInput.disabled = true;
+    } 
+    else if (attempts === 0) {
+        message.textContent = "❌ Game Over! Word: " + word;
+        guessInput.disabled = true;
+    }
+
+    updateDisplay();
+}
+
+function restartGame() {
+    startGame();
+}
+
+startGame();
+</script>
+
+</body>
+</html>
